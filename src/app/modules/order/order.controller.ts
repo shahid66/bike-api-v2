@@ -17,16 +17,16 @@ const createOrder = catchAsync(async (req, res) => {
   });
 });
 
-const getRevenue = catchAsync(async (req, res) => {
-  const totalRevenue = await OrderServices.getRevenueFromDB();
+// const getRevenue = catchAsync(async (req, res) => {
+//   const totalRevenue = await OrderServices.getRevenueFromDB();
 
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'Total revenue calculated successfully',
-    data: totalRevenue,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: httpStatus.CREATED,
+//     success: true,
+//     message: 'Total revenue calculated successfully',
+//     data: totalRevenue,
+//   });
+// });
 
 const getOrders = catchAsync(async (req, res) => {
   const order = await OrderServices.getOrders();
@@ -35,6 +35,29 @@ const getOrders = catchAsync(async (req, res) => {
     statusCode: httpStatus.CREATED,
     success: true,
     message: 'Order retrieved successfully',
+    data: order,
+  });
+});
+const updateOrdersStatus = catchAsync(async (req, res) => {
+  const { order_id, status } = req.params;
+
+  const order = await OrderServices.updateOrderStatus(order_id, status);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Order Status Change',
+    data: order,
+  });
+});
+const deleteOrder = catchAsync(async (req, res) => {
+  const { order_id } = req.params;
+  const order = await OrderServices.deleteOrder(order_id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Order Deleted successfully',
     data: order,
   });
 });
@@ -66,6 +89,7 @@ export const OrderControllers = {
   createOrder,
   getOrders,
   verifyPayment,
-
+  deleteOrder,
   getUserOrder,
+  updateOrdersStatus,
 };

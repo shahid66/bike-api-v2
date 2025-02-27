@@ -5,7 +5,7 @@ import { IProduct } from './product.interface';
 import { ProductModel } from './product.model';
 
 const createProductIntoDB = async (product: IProduct, files: any) => {
-  if (files) {
+  if (files && files.length > 0) {
     const uploadedFiles = files.map((file: any) => ({
       imageName: file.filename,
       path: file.path,
@@ -25,7 +25,9 @@ const updateProductFromDB = async (
   productData: IProduct,
   files: any,
 ) => {
-  if (files) {
+  
+
+  if (files && files.length > 0) {
     const uploadedFiles = files.map((file: any) => ({
       imageName: file.filename,
       path: file.path,
@@ -41,6 +43,7 @@ const updateProductFromDB = async (
     new: true,
     runValidators: true,
   });
+  console.log(id,result,"pp")
   return result;
 };
 

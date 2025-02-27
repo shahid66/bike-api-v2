@@ -100,16 +100,31 @@ const createOrder = async (
   const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
 
   if (payment?.transactionStatus) {
-   
     order = await order.updateOne({
       transaction: {
         id: payment.sp_order_id,
         transactionStatus: payment.transactionStatus,
-        
-        
       },
     });
   }
+
+  const productQuantityUpdate = await Promise.all(
+    products.map(async (item) => {
+      const product = await ProductModel.findById(item.product);
+
+      if (product) {
+        if (product.quantity > 0) {
+          const updateQuantity = product.quantity - item.quantity;
+
+          await ProductModel.findByIdAndUpdate(product._id, {
+            quantity: updateQuantity,
+          });
+        }
+
+        return product;
+      }
+    }),
+  );
 
   return payment.checkout_url;
 };
@@ -143,6 +158,24 @@ const verifyPayment = async (order_id: string) => {
 
   return verifiedPayment;
 };
+const updateOrderStatus = async (order_id: string, order_status: string) => {
+  const result = await OrderModel.findByIdAndUpdate(
+    {
+      _id: order_id,
+    },
+    { status: order_status },
+    { new: true },
+  );
+
+  return result;
+};
+const deleteOrder = async (order_id: string) => {
+  const result = await OrderModel.findByIdAndDelete({
+    _id: order_id,
+  });
+
+  return result;
+};
 
 const getOrders = async () => {
   const data = await OrderModel.find();
@@ -162,4 +195,6 @@ export const OrderServices = {
   verifyPayment,
   getUserOrder,
   getOrders,
+  updateOrderStatus,
+  deleteOrder,
 };
